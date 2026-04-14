@@ -223,7 +223,7 @@ There is no API to hit, no integrations to build, nothing to get locked out of. 
 
 The protocol *is* the API.
 
-**This has deep implications for the lifecycle of products.** If a product gets shut down, the data doesn't disappear. It's still in its users' repos. Someone can build a replacement that makes this data comes back to life. Someone can build a new product that incorporates *some* of that data, or lets users choose what to import. Someone can build an alternative projection of existing data--*a forked product.*
+**This has deep implications for the lifecycle of products.** If a product gets shut down, the data doesn't disappear. It's still in its users' repos. Someone can build a replacement that makes this data come back to life. Someone can build a new product that incorporates *some* of that data, or lets users choose what to import. Someone can build an alternative projection of existing data--*a forked product.*
 
 This also reduces the "cold start" problem for new apps. If some of the data you care about already exists on the network, you can bootstrap your product off of that. For example, if you're launching a short video app, you can piggyback on the Bluesky `follow` records so that people don't have to find each other again. But if that doesn't make sense for your app, you can have your own `follow` records instead, or offer a one-time import. All existing data is up for reuse and remixing.
 
@@ -259,19 +259,17 @@ To avoid opening a million event socket connections, it makes sense to listen to
 
 You can then filter down such a stream to just the events you're interested in, and then update your local database in response to the events your app cares about.
 
-For example, Leaflet is only interested in events concerning `pub.leaflet.*` records. However, Leaflet can also *choose* to listen to other events. If Leaflet wanted to add a feature that shows backlinks to Bluesky discussions of a Leaflet document, it would simply start tracking `bsky.app.feed.post` records too. *(Edit: I've been informed that Leaflet [already does this](https://bsky.app/profile/o.simardcasanova.net/post/3luujudlr5c2j) to display quotes from Bluesky.)*
+For example, Leaflet is only interested in events concerning `pub.leaflet.*` records. However, Leaflet can also *choose* to listen to other events. If Leaflet wanted to add a feature that shows backlinks to Bluesky discussions of a Leaflet document, it would simply start tracking `app.bsky.feed.post` records too. *(Edit: I've been informed that Leaflet [already does this](https://bsky.app/profile/o.simardcasanova.net/post/3luujudlr5c2j) to display quotes from Bluesky.)*
 
 You can see the combined event stream from every known repository [here](https://pdsls.dev/jetstream?instance=wss%3A%2F%2Fjetstream1.us-east.bsky.network%2Fsubscribe):
 
 <Video src="./jetstream.mp4" loop muted autoPlay playsInline />
 
-<br />
-
 This is a realtime stream of every single event on the network. It's dominated by `app.bsky.*` records because Bluesky is the most-used app, but you can filter it down to other record types. This retransmitter (called a "relay") is operated by Bluesky, but you don't have to depend on it. The [Blacksky community](https://github.com/blacksky-algorithms) runs [their own relay implementation](https://github.com/blacksky-algorithms/rsky/tree/main/rsky-relay) at `wss://atproto.africa`, which you can try [here](https://pdsls.dev/firehose?instance=wss%3A%2F%2Fatproto.africa). It doesn't matter which relay is used by which app--everyone "sees" the same web.
 
 An important detail is that commits are cryptographically signed, which means that you don't need to trust a relay or a cache of network data. You can verify that the records haven't been tampered with, and each commit is legitimate. This is why "AT" in "AT Protocol" stands for "authenticated transfer". You're supposed to pronounce it like “@" ("at") though. Don't say "ay-tee" or you'll embarrass me!
 
-As time goes by, we'll see more infrastructure built around and for open social apps. [Graze](https://www.graze.social/) is letting you build algorithmic feeds, [Quickslice](https://quickslice.slices.network/) and [Tap](https://docs.bsky.app/blog/introducing-tap) simplify indexing, [Constellation](https://constellation.microcosm.blue/) and [If This Then AT://](https://app.ifthisthen.at/) provide querying and automation.
+As time goes by, we'll see more infrastructure built around and for open social apps. [Graze](https://www.graze.social/) is letting you build algorithmic feeds, [Quickslice](https://quickslice.slices.network/) and [Tap](https://docs.bsky.app/blog/introducing-tap) simplify indexing, [Constellation](https://constellation.microcosm.blue/) and [Slingshot](https://slingshot.microcosm.blue/) let you query backlinks and cached records.
 
 These are all technical details, though.
 
