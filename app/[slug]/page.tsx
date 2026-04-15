@@ -78,100 +78,102 @@ export default async function PostPage({
 
           <Wrapper>
             <div className="flex flex-col gap-8">
-            <MDXRemote
-              source={content}
-              components={{
-                p: markdown.P,
-                h2: markdown.H2,
-                h3: markdown.H3,
-                h4: markdown.H4,
-                blockquote: markdown.Blockquote,
-                ul: markdown.UL,
-                ol: markdown.OL,
-                li: markdown.LI,
-                pre: markdown.Pre,
-                code: markdown.Code,
-                table: markdown.Table,
-                th: markdown.Th,
-                td: markdown.Td,
-                hr: markdown.Hr,
-                a: (props: React.ComponentProps<"a">) => (
-                  <TextLink {...props} href={props.href ?? ""} />
-                ),
-                img: async ({ src, ...rest }) => {
-                  if (
-                    src &&
-                    !/^https?:\/\//.test(src) &&
-                    src.endsWith(".svg")
-                  ) {
-                    const svgPath = `./public/${slug}/${src}`;
-                    const svgContent = await readFile(svgPath, "utf8");
-                    const maxWidth = src.endsWith("-full.svg")
-                      ? "100%"
-                      : "450px";
-                    const colorReplacedSvg = svgContent
-                      .replace(/#ffffff/gi, "var(--bg-rotated)")
-                      .replace(/<metadata>.*?<\/metadata>/s, "")
-                      .replace(
-                        "<svg",
-                        `<svg style="max-width: ${maxWidth}; width: 100%; height: auto;"`,
+              <MDXRemote
+                source={content}
+                components={{
+                  p: markdown.P,
+                  h2: markdown.H2,
+                  h3: markdown.H3,
+                  h4: markdown.H4,
+                  blockquote: markdown.Blockquote,
+                  ul: markdown.UL,
+                  ol: markdown.OL,
+                  li: markdown.LI,
+                  pre: markdown.Pre,
+                  code: markdown.Code,
+                  table: markdown.Table,
+                  th: markdown.Th,
+                  td: markdown.Td,
+                  hr: markdown.Hr,
+                  a: (props: React.ComponentProps<"a">) => (
+                    <TextLink {...props} href={props.href ?? ""} />
+                  ),
+                  img: async ({ src, ...rest }) => {
+                    if (
+                      src &&
+                      !/^https?:\/\//.test(src) &&
+                      src.endsWith(".svg")
+                    ) {
+                      const svgPath = `./public/${slug}/${src}`;
+                      const svgContent = await readFile(svgPath, "utf8");
+                      const maxWidth = src.endsWith("-full.svg")
+                        ? "100%"
+                        : "450px";
+                      const colorReplacedSvg = svgContent
+                        .replace(/#ffffff/gi, "var(--bg-rotated)")
+                        .replace(/<metadata>.*?<\/metadata>/s, "")
+                        .replace(
+                          "<svg",
+                          `<svg style="max-width: ${maxWidth}; width: 100%; height: auto;"`,
+                        );
+
+                      return (
+                        <span
+                          dangerouslySetInnerHTML={{ __html: colorReplacedSvg }}
+                          style={{
+                            filter: "var(--svg-filter)",
+                            display: "inline-block",
+                            ...rest.style,
+                          }}
+                          {...rest}
+                        />
                       );
+                    }
 
+                    let finalSrc = src;
+                    if (src && !/^https?:\/\//.test(src)) {
+                      // https://github.com/gaearon/overreacted.io/issues/827
+                      finalSrc = `/${slug}/${src}`;
+                    }
+
+                    return <markdown.Img src={finalSrc} {...rest} />;
+                  },
+                  Video: ({ src, poster, ...rest }) => {
+                    let finalSrc = src;
+                    if (src && !/^https?:\/\//.test(src)) {
+                      finalSrc = `/${slug}/${src}`;
+                    }
+                    let finalPoster = poster;
+                    if (poster && !/^https?:\/\//.test(poster)) {
+                      finalPoster = `/${slug}/${poster}`;
+                    }
                     return (
-                      <span
-                        dangerouslySetInnerHTML={{ __html: colorReplacedSvg }}
-                        style={{
-                          filter: "var(--svg-filter)",
-                          display: "inline-block",
-                          ...rest.style,
-                        }}
-                        {...rest}
-                      />
+                      <video src={finalSrc} poster={finalPoster} {...rest} />
                     );
-                  }
-
-                  let finalSrc = src;
-                  if (src && !/^https?:\/\//.test(src)) {
-                    // https://github.com/gaearon/overreacted.io/issues/827
-                    finalSrc = `/${slug}/${src}`;
-                  }
-
-                  return <markdown.Img src={finalSrc} {...rest} />;
-                },
-                Video: ({ src, poster, ...rest }) => {
-                  let finalSrc = src;
-                  if (src && !/^https?:\/\//.test(src)) {
-                    finalSrc = `/${slug}/${src}`;
-                  }
-                  let finalPoster = poster;
-                  if (poster && !/^https?:\/\//.test(poster)) {
-                    finalPoster = `/${slug}/${poster}`;
-                  }
-                  return <video src={finalSrc} poster={finalPoster} {...rest} />;
-                },
-                ...postComponents,
-              }}
-              options={{
-                mdxOptions: {
-                  useDynamicImport: true,
-                  remarkPlugins: [
-                    remarkSmartpants,
-                    remarkGfm,
-                    [remarkMdxEvalCodeBlock, filename],
-                  ] as any,
-                  rehypePlugins: [
-                    [
-                      rehypePrettyCode,
-                      {
-                        theme: overnight,
-                        defaultLang: { block: "text" },
-                      },
-                    ],
-                    [rehypeSlug],
-                  ] as any,
-                } as any,
-              }}
-            />
+                  },
+                  ...postComponents,
+                }}
+                options={{
+                  mdxOptions: {
+                    useDynamicImport: true,
+                    remarkPlugins: [
+                      remarkSmartpants,
+                      remarkGfm,
+                      [remarkMdxEvalCodeBlock, filename],
+                    ] as any,
+                    rehypePlugins: [
+                      [
+                        rehypePrettyCode,
+                        {
+                          theme: overnight,
+                          defaultLang: { block: "text" },
+                        },
+                      ],
+                      [rehypeSlug],
+                    ] as any,
+                  } as any,
+                }}
+              />
             </div>
           </Wrapper>
           {!data.nocta && (
@@ -184,7 +186,6 @@ export default async function PostPage({
                 <span className="tip-bg" />
                 Pay what you like
               </a>
-              <TextLink href="/hire-me-in-japan/">Hire me</TextLink>
             </div>
           )}
           <hr className="opacity-60 dark:opacity-10" />
